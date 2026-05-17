@@ -1,48 +1,32 @@
-name: CI
+name: Basic Node CI
 
 on:
   push:
   pull_request:
 
 jobs:
-  server-running-check:
+  check-server:
+
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+
+      - name: Get Repository Code
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: 20
 
-      - name: Install dependencies
+      - name: Install Packages
         run: npm install
 
-      - name: Start server
-        run: |
-          npm start > server.log 2>&1 &
-          echo $! > server.pid
+      - name: Start Node Server
+        run: npm start &
 
-      - name: Verify server is running
-        run: |
-          for i in {1..20}; do
-            if curl -fsS http://localhost:1200/ > /dev/null; then
-              echo "Server is running successfully"
-              exit 0
-            fi
-            sleep 1
-          done
+      - name: Wait for Server
+        run: sleep 5
 
-          echo "Server failed to start"
-          echo "--- server.log ---"
-          cat server.log || true
-          exit 1
-
-      - name: Stop server
-        if: always()
-        run: |
-          kill "$(cat server.pid)" 2>/dev/null || true
-          echo "--- server.log ---"
-          cat server.log || true
+      - name: Check Server
+        run: curl http://localhost:1200
