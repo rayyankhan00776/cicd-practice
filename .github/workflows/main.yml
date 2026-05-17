@@ -28,7 +28,7 @@ jobs:
       - name: Verify server is running
         run: |
           for i in {1..20}; do
-            if curl -fsS http://localhost:3000/ > /dev/null; then
+            if curl -fsS http://localhost:1200/ > /dev/null; then
               echo "Server is running successfully"
               exit 0
             fi
